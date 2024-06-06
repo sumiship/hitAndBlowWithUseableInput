@@ -1,35 +1,61 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useEffect, useState } from "react";
+import Input from "./Input";
+import LogTable from "./LogTable";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const NUMBER_LENGTH = 4;
+
+  const [answerNumbers, setAnswerNumbers] = useState<number[]>([]);
+  const [inputtedNumbersLog, setInputtedNumbersLog] = useState<number[][]>([]);
+  const [isEnd, setIsEnd] = useState(false);
+
+  const setRandomAnswerNumbers = () => {
+    const answerNumbers = [...Array(10)].reduce((acc, _, i) => {
+      acc.splice(Math.floor(Math.random() * i), 0, i);
+      return acc;
+    }, []);
+    setAnswerNumbers(answerNumbers.slice(0, 4));
+  };
+
+  const submit = (numberList: number[]) => {
+    const hitCount = [...Array(NUMBER_LENGTH)].reduce((acc, _, i) => acc + (numberList[i] === answerNumbers[i] ? 1 : 0), 0);
+    const blowCount = numberList.reduce((acc, v) => acc + (answerNumbers.includes(v) ? 1 : 0), 0) - hitCount;
+    setInputtedNumbersLog([...inputtedNumbersLog, [...numberList, hitCount, blowCount]]);
+    if (hitCount === NUMBER_LENGTH || inputtedNumbersLog.length >= 5) setIsEnd(true);
+  };
+
+  const restart = () => {
+    setRandomAnswerNumbers();
+    setInputtedNumbersLog([]);
+    setIsEnd(false);
+  };
+
+  useEffect(() => {
+    setRandomAnswerNumbers();
+  }, []);
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="main">
+      <div className="answer-container">
+        {answerNumbers.map((number, i) => (
+          <div className="answer" key={"answer" + i}>
+            {isEnd ? number : ""}
+          </div>
+        ))}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
+      <div className="log-table-container">
+        <LogTable numbersLog={inputtedNumbersLog} />
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+      {isEnd ? (
+        <div className="restart-button" onClick={restart}>
+          RESTART
+        </div>
+      ) : (
+        <Input numberLength={NUMBER_LENGTH} onSubmit={submit} />
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;

@@ -1,0 +1,28 @@
+.log-header {
+  display: flex;
+  font-size: 24px;
+  font-weight: bold;
+}
+.log-data {
+  height: 300px;
+  background-color: rgb(59, 59, 59);
+  margin-bottom: 8px;
+}
+
+.log-row {
+  display: flex;
+  font-size: 32px;
+  border-bottom: 2px solid #242424;
+}
+
+.log-numbers {
+  width: 130px;
+}
+
+.log-hit {
+  width: 50px;
+}
+
+.log-blow {
+  width: 50px;
+}
